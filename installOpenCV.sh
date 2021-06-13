@@ -1,6 +1,6 @@
-######################################
-# INSTALL OPENCV ON UBUNTU OR DEBIAN #
-######################################
+###########################################
+# INSTALL OPENCV ON Rasbery PI 3 or newer #
+###########################################
 
 # -------------------------------------------------------------------- |
 #                       SCRIPT OPTIONS                                 |
@@ -13,19 +13,12 @@ OPENCV_CONTRIB='NO'          # Install OpenCV's extra modules (YES/NO)
 # |------------------------------------------------------|
 # | OS               | OpenCV       | Test | Last test   |
 # |------------------|--------------|------|-------------|
-# | Debian 10.2      | OpenCV 4.2.0 | OK   | 26 Dec 2019 |
+# | RPI 3b           | OpenCV 4.2.0 | OK   | 6  Jun 2021 |
 # |----------------------------------------------------- |
-# | Debian 10.1      | OpenCV 4.1.1 | OK   | 28 Sep 2019 |
-# |----------------------------------------------------- |
-# | Ubuntu 18.04 LTS | OpenCV 4.1.0 | OK   | 22 Jun 2019 |
-# | Debian 9.9       | OpenCV 4.1.0 | OK   | 22 Jun 2019 |
-# |----------------------------------------------------- |
-# | Ubuntu 18.04 LTS | OpenCV 3.4.2 | OK   | 18 Jul 2018 |
-# | Debian 9.5       | OpenCV 3.4.2 | OK   | 18 Jul 2018 |
 
 
 
-# 1. KEEP UBUNTU OR DEBIAN UP TO DATE
+# 1. KEEP RPI UP TO DATE
 
 sudo apt-get -y update
 sudo apt-get -y upgrade       # Uncomment to install new versions of packages currently installed
@@ -67,33 +60,42 @@ sudo apt-get install -y imutils
 
 # 3. INSTALL THE LIBRARY
 
-wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
+# wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
+wget https://github.com/michaelmcode/files/${OPENCV_VERSION}.zip
+
 unzip ${OPENCV_VERSION}.zip && rm ${OPENCV_VERSION}.zip
-mv opencv-${OPENCV_VERSION} OpenCV
+tar -xf open-cv${OPENCV_VERSION}-armhf.tar.bz2 && rm open-cv${OPENCV_VERSION}-armhf.tar.bz2
+sudo mv opencv-4.2.0 /opt
 
-if [ $OPENCV_CONTRIB = 'YES' ]; then
-  wget https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
-  unzip ${OPENCV_VERSION}.zip && rm ${OPENCV_VERSION}.zip
-  mv opencv_contrib-${OPENCV_VERSION} opencv_contrib
-  mv opencv_contrib OpenCV
-fi
+sudo mv opencv.pc /usr/lib/arm-linux-gnueabihf/pkgconfig
+echo 'export LD_LIBRARY_PATH=/opt/opencv-4.2.0/lib:$LD_LIBRARY_PATH' >> .bashrc
+source .bashrc
+sudo ln -s /opt/opencv-4.2.0/lib/python2.7/dist-packages/cv2 /usr/lib/python2.7/dist-packages/cv2
+sudo ln -s /opt/opencv-4.2.0/lib/python3.7/dist-packages/cv2 /usr/lib/python3/dist-packages/cv2
 
-cd OpenCV && mkdir build && cd build
+#if [ $OPENCV_CONTRIB = 'YES' ]; then
+#  wget https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
+#  unzip ${OPENCV_VERSION}.zip && rm ${OPENCV_VERSION}.zip
+#  mv opencv_contrib-${OPENCV_VERSION} opencv_contrib
+#  mv opencv_contrib OpenCV
+#fi
 
-if [ $OPENCV_CONTRIB = 'NO' ]; then
-cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON \
-      -DWITH_XINE=ON -DENABLE_PRECOMPILED_HEADERS=OFF ..
-fi
+#cd OpenCV && mkdir build && cd build
 
-if [ $OPENCV_CONTRIB = 'YES' ]; then
-cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON \
-      -DWITH_XINE=ON -DENABLE_PRECOMPILED_HEADERS=OFF \
-      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ..
-fi
+#if [ $OPENCV_CONTRIB = 'NO' ]; then
+#cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON \
+#      -DWITH_XINE=ON -DENABLE_PRECOMPILED_HEADERS=OFF ..
+#fi
 
-make -j8
-sudo make install
-sudo ldconfig
+#if [ $OPENCV_CONTRIB = 'YES' ]; then
+#cmake -DWITH_QT=ON -DWITH_OPENGL=ON -DFORCE_VTK=ON -DWITH_TBB=ON -DWITH_GDAL=ON \
+#      -DWITH_XINE=ON -DENABLE_PRECOMPILED_HEADERS=OFF \
+#      -DOPENCV_EXTRA_MODULES_PATH=../opencv_contrib/modules ..
+#fi
+
+#make -j8
+#sudo make install
+#sudo ldconfig
 
 
 # ---------------------- |
